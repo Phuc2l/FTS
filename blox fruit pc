@@ -2562,16 +2562,20 @@ if World3 then
         Name = "\\\\Bone//",
         Side = "Left"
     })
-    BoneSection:AddButton({
-        Name = "Checking Bone",
-        Callback = function()
-            game.StarterGui:SetCore("SendNotification", {
-                Title = "Checking Bone", 
-                Text = ("Your Bone : "..(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Bones","Check")))
-            })
-            wait(1)
-        end
+
+    local BoneCheck = BoneSection:AddLabel({
+        Name = "Bone",
+        Flag = "Bone"
     })
+
+    spawn(function()
+        while wait() do
+            pcall(function()
+                BoneCheck:Set("Your Bone : "..(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Bones","Check")))
+            end)
+        end
+    end)
+
     
     BoneSection:AddToggle{
         Name = "Auto Farm Bone",
@@ -2670,6 +2674,17 @@ if World3 then
             end
         end
     end)
+
+    BoneSection:AddButton({
+        Name = "Checking Bone",
+        Callback = function()
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Checking Bone", 
+                Text = ("Your Bone : "..(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Bones","Check")))
+            })
+            wait(1)
+        end
+    })
 end
 local BossSection = MainTab:CreateSection({
     Name = "\\\\Boss//",
@@ -6732,23 +6747,7 @@ spawn(function()
 					end
 				end)
 			end
-		end)
-
-
-if World2 then
-    Misc:Button("Remove Lava",function()
-        for i,v in pairs(game.Workspace:GetDescendants()) do
-            if v.Name == "Lava" then   
-                v:Destroy()
-            end
-        end
-        for i,v in pairs(game.ReplicatedStorage:GetDescendants()) do
-            if v.Name == "Lava" then   
-                v:Destroy()
-            end
-        end
-    end)
-end
+end)
 
 local DungeonTab = PepsisWorld:CreateTab({
     Name = "\\\Dungeon/"
@@ -7144,6 +7143,15 @@ spawn(function()
         end
     end
 end)
+
+if World3 then
+MainDungeonSection:AddButton({
+    Name = "Teleport To Lab",
+    Callback = function()
+        topos(CFrame.new(-5040.5791015625, 314.8592224121094, -2881.746337890625))
+    end
+})
+end
 if World2 then
 local LawDungeonSection = DungeonTab:CreateSection({
     Name = "\\\\Law Dungeon//",
@@ -7454,6 +7462,96 @@ local MainV4 = RaceTab:CreateSection({
     Name = "\\\\Auto Comple Trial V4//",
     Side = "Right"
     })
+
+    MainV4:AddToggle{
+        Name = "Auto Complete Trial Fish",
+        Flag = "Auto Complete Trial Fish",
+        Value = _G.Settings.Complete_Fish,
+        Callback  = function(value)
+            _G.Complete_Fish = value
+            _G.Settings.Complete_Fish = value
+            saveSettings()
+        end
+    }
+    
+    spawn(function()
+        pcall(function()
+            while wait() do
+                if _G.Complete_Fish then
+                    if game:GetService("Players").LocalPlayer.Data.Race.Value == "Fishman" then
+                        for i,v in pairs(game:GetService("Workspace").SeaBeasts.SeaBeast1:GetDescendants()) do
+                            if v.Name ==  "HumanoidRootPart" then
+                                getgenv().ToTarget(v.CFrame* CFrame.new(20,450,0))
+                                for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                                    if v:IsA("Tool") then
+                                        if v.ToolTip == "Melee" then
+                                            game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                                        end
+                                    end
+                                end
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,122,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,122,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(.2)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,120,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,120,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(.2)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,99,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,99,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                                    if v:IsA("Tool") then
+                                        if v.ToolTip == "Blox Fruit" then
+                                            game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                                        end
+                                    end
+                                end
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,122,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,122,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(.2)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,120,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,120,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(.2)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,99,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,99,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                        
+                                wait(0.5)
+                                for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                                    if v:IsA("Tool") then
+                                        if v.ToolTip == "Sword" then
+                                            game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                                        end
+                                    end
+                                end
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,122,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,122,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(.2)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,120,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,120,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(.2)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,99,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,99,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(0.5)
+                                for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                                    if v:IsA("Tool") then
+                                        if v.ToolTip == "Gun" then
+                                            game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                                        end
+                                    end
+                                end
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,122,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,122,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(.2)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,120,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,120,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                wait(.2)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(true,99,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                                game:GetService("VirtualInputManager"):SendKeyEvent(false,99,false,game.Players.LocalPlayer.Character.HumanoidRootPart)
+                              end
+                           end
+                    end
+                end
+            end
+        end)
+    end)
 
 MainV4:AddToggle{
     Name = "Auto Complete Trial Ghoul/Human",
