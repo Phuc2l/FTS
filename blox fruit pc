@@ -6369,6 +6369,144 @@ end)
 local CombatTab = PepsisWorld:CreateTab({
     Name = "\\\Combat/"
 })
+local PlayerSection = CombatTab:CreateSection({
+    Name = "\\\\Player//",
+    Side = "Left"
+})
+local plyserv = PlayerSection:AddLabel({
+    Name = "Check Player"
+})
+
+spawn(function()
+    while wait() do
+        pcall(function()
+            for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+                if i == 12 then
+                    plyserv:Set("Players :".." "..i.." ".."/".." ".."12".." ".."(Max)")
+                elseif i == 1 then
+                    plyserv:Set("Player :".." "..i.." ".."/".." ".."12")
+                else
+                    plyserv:Set("Players :".." "..i.." ".."/".." ".."12")
+                end
+            end
+        end)
+    end
+end)
+
+Playerslist = {}
+    
+    for i,v in pairs(game:GetService("Players"):GetChildren()) do
+        table.insert(Playerslist,v.Name)
+    end
+
+    PlayerSection:AddDropdown({
+        Name = "Selected Player",
+        Flag = "Selected_Player",
+        List = Playerslist,
+        Value = _G.SelectPly,
+        Callback = function(value)
+            _G.SelectPly = value
+            saveSettings()
+        end
+    })
+
+    PlayerSection:AddButton({
+        Name = "Refresh Player",
+        Callback = function()
+            Playerslist = {}
+            SelectedPly:Clear()
+            for i,v in pairs(game:GetService("Players"):GetChildren()) do  
+                SelectedPly:Add(v.Name)
+            end
+        end
+    })
+
+    PlayerSection:AddToggle{
+        Name = "Spectate Player",
+        Flag = "Spectate Player",
+        Value = _G.Settings.SpectatePlys,
+        Callback  = function(value)
+            SpectatePlys = value
+            _G.Settings.SpectatePlys = value
+            saveSettings()
+            local plr1 = game:GetService("Players").LocalPlayer.Character.Humanoid
+        local plr2 = game:GetService("Players"):FindFirstChild(_G.SelectPly)
+        repeat wait(.1)
+            game:GetService("Workspace").Camera.CameraSubject = game:GetService("Players"):FindFirstChild(_G.SelectPly).Character.Humanoid
+        until SpectatePlys == false 
+        game:GetService("Workspace").Camera.CameraSubject = game:GetService("Players").LocalPlayer.Character.Humanoid
+        end
+    }
+
+    PlayerSection:AddToggle{
+        Name = "Teleport Player",
+        Flag = "Teleport Player",
+        Value = _G.Settings.TeleportPly,
+        Callback  = function(value)
+            _G.TeleportPly = value
+            _G.Settings.TeleportPly = value
+            saveSettings()
+            pcall(function()
+                if _G.TeleportPly then
+                    repeat topos(game:GetService("Players")[_G.SelectPly].Character.HumanoidRootPart.CFrame) wait() until _G.TeleportPly == false
+                end
+                StopTween(_G.TeleportPly)
+            end)
+        end
+    }
+
+    PlayerSection:AddToggle{
+        Name = "Auto Farm Player",
+        Flag = "Auto Farm Player",
+        Value = _G.Settings._Auto_Kill_Ply,
+        Callback  = function(value)
+            _G.Auto_Kill_Ply = value
+            _G.Settings._Auto_Kill_Ply = value
+            saveSettings()
+            StopTween(_G.Auto_Kill_Ply)
+        end
+    }
+    spawn(function()
+        while wait() do
+            if _G.Auto_Kill_Ply then
+                pcall(function()
+                    if _G.SelectPly ~= nil then 
+                        if game.Players:FindFirstChild(_G.SelectPly) then
+                            if game.Players:FindFirstChild(_G.SelectPly).Character.Humanoid.Health > 0 then
+                                repeat task.wait()
+                                    EquipWeapon(_G.Select_Weapon)
+                                    AutoHaki()
+                                    game.Players:FindFirstChild(_G.SelectPly).Character.HumanoidRootPart.CanCollide = false
+                                    topos(game.Players:FindFirstChild(_G.SelectPly).Character.HumanoidRootPart.CFrame * CFrame.new(0,35,0))
+                                    spawn(function()
+                                        pcall(function()
+                                            if _G.Select_Weapon == SelectWeaponGun then
+                                                local args = {
+                                                    [1] = game.Players:FindFirstChild(_G.SelectPly).Character.HumanoidRootPart.Position,
+                                                    [2] = game.Players:FindFirstChild(_G.SelectPly).Character.HumanoidRootPart
+                                                }
+                                                game:GetService("Players").LocalPlayer.Character[SelectWeaponGun].RemoteFunctionShoot:InvokeServer(unpack(args))
+                                            else
+                                                game:GetService("VirtualUser"):CaptureController()
+                                                game:GetService("VirtualUser"):Button1Down(Vector2.new(1280,672))
+                                            end
+                                        end)
+                                    end)
+                                until game.Players:FindFirstChild(_G.SelectPly).Character.Humanoid.Health <= 0 or not game.Players:FindFirstChild(_G.SelectPly) or not _G.Auto_Kill_Ply
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    end)
+
+    PlayerSection:AddButton({
+        Name = "Auto Quest Player",
+        Callback = function()
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("PlayerHunter")
+        end
+    })
 
 local LegitBountySection = CombatTab:CreateSection({
     Name = "\\\\Aimbot//",
@@ -9468,6 +9606,326 @@ OpenMenuSection:AddButton({
         game.Players.localPlayer.PlayerGui.Main.Colors.Visible = true
     end
 })
+local SplaeSection = MiscTab:CreateSection({
+    Name = "\\\\Status Player//",
+    Side = "Right"
+})
+
+local racene = SplaeSection:AddLabel({
+    Name = " Race:" ..game:GetService("Players").LocalPlayer.Data.Race.Value
+})
+local fruitne = SplaeSection:AddLabel({
+    Name = " Fruit:" ..game.Players.LocalPlayer.Data.DevilFruit.Value
+})
+local lvne = SplaeSection:AddLabel({
+    Name = " Level:" ..game.Players.localPlayer.Data.Level.Value
+})
+local bountyne = SplaeSection:AddLabel({
+    Name = " Bounty:" ..game:GetService("Players").LocalPlayer.leaderstats["Bounty/Honor"].Value
+})
+
+local SMeleeSection = MiscTab:CreateSection({
+    Name = "\\\\Status Melee//",
+    Side = "Right"
+})
+
+local Superhuman = SMeleeSection:AddLabel({
+    Name = "❌: Superhuman"
+})
+local Death_Step = SMeleeSection:AddLabel({
+    Name = "❌: Death Step"
+})
+local Sharkman_Karate = SMeleeSection:AddLabel({
+    Name = "❌: Sharkman Karate"
+})
+local Electric_Claw = SMeleeSection:AddLabel({
+    Name = "❌: Electric Claw"
+})
+local Dragon_Talon = SMeleeSection:AddLabel({
+    Name = "❌: Dragon Talon"
+})
+local God_Human = SMeleeSection:AddLabel({
+    Name = "❌: God Human"
+})
+
+spawn(function()
+    while task.wait() do
+        if game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuySuperhuman",true) == 1 then
+            Superhuman:Set("✅: Superhuman")
+        end
+        if game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyDeathStep",true) == 1 then
+            Death_Step:Set("✅: Death Step")
+        end
+        if game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuySharkmanKarate",true) == 1 then
+            Sharkman_Karate:Set("✅: Sharkman Karate")
+        end
+        if game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyElectricClaw",true) == 1 then
+            Electric_Claw:Set("✅: Electric Claw")
+        end
+        if game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyDragonTalon",true) == 1 then
+            Dragon_Talon:Set("✅: Dragon Talon")
+        end
+        if game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyGodhuman",true) == 1 then
+            God_Human:Set("✅: God_Human")
+        end
+    end
+end)
+
+local SquestSection = MiscTab:CreateSection({
+    Name = "\\\\Status Quest//",
+    Side = "Right"
+})
+local Bartilo_Quest = SquestSection:AddLabel({
+    Name = "❌: Bartilo Quest"
+})
+local Don_Swan_Quest = SquestSection:AddLabel({
+    Name = "❌: Don Swan Quest"
+})
+local Kill_Don_Swan = SquestSection:AddLabel({
+    Name = "❌: Kill Don Swan"
+})
+spawn(function()
+    while task.wait() do
+        if game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BartiloQuestProgress","Bartilo") == 3 then
+            Bartilo_Quest:Set("✅: Bartilo Quest")
+        end
+
+        if game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("GetUnlockables").FlamingoAccess == nil then
+            --Nothing
+        else
+            Don_Swan_Quest:Set("✅: Don Swan Quest")
+        end
+
+        if game:GetService("ReplicatedStorage").Remotes["CommF_"]:InvokeServer("ZQuestProgress", "Check") == 1 then
+            Kill_Don_Swan:Set("✅: Kill Don Swan")
+        end
+    end
+end)
+
+local SSWSection = MiscTab:CreateSection({
+    Name = "\\\\Status Sword//",
+    Side = "Right"
+})
+local Saber = SSWSection:AddLabel({
+    Name = "❌: Saber"
+})
+local Rengoku = SSWSection:AddLabel({
+    Name = "❌: Rengoku"
+})
+local Midnight_Blade = SSWSection:AddLabel({
+    Name = "❌: Midnight Blade"
+})
+local Dragon_Trident = SSWSection:AddLabel({
+    Name = "❌: Dragon Trident"
+})
+local Yama = SSWSection:AddLabel({
+    Name = "❌: Yama"
+})
+local Buddy_Sword = SSWSection:AddLabel({
+    Name = "❌: Buddy Sword"
+})
+local Canvander = SSWSection:AddLabel({
+    Name = "❌: Canvander"
+})
+local Twin_Hooks = SSWSection:AddLabel({
+    Name = "❌: Twin Hooks"
+})
+local Spikey_Trident = SSWSection:AddLabel({
+    Name = "❌: Spikey Trident"
+})
+local Hallow_Scythe = SSWSection:AddLabel({
+    Name = "❌: Hallow Scythe"
+})
+local Dark_Dagger = SSWSection:AddLabel({
+    Name = "❌: Dark Dagger"
+})
+local Tushita = SSWSection:AddLabel({
+    Name = "❌: Tushita"
+})
+local Dark_Blade = SSWSection:AddLabel({
+    Name = "❌: Dark Blade"
+})
+local Cursed_Dual_Katana = SSWSection:AddLabel({
+    Name = "❌: Cursed Dual Katana"
+})
+
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            for i,v in pairs(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("getInventoryWeapons")) do
+                if v.Name == "Saber" then
+                    Saber:Set("✅: Saber")
+                end
+                if v.Name == "Rengoku" then
+                    Rengoku:Set("✅: Rengoku")
+                end
+                if v.Name == "Midnight Blade" then
+                    Midnight_Blade:Set("✅: Midnight Blade")
+                end
+                if v.Name == "Dragon Trident" then
+                    Dragon_Trident:Set("✅: Dragon Trident")
+                end
+                if v.Name == "Yama" then
+                    Yama:Set("✅: Yama")
+                end
+                if v.Name == "Buddy Sword" then
+                    Buddy_Sword:Set("✅: Buddy Sword")
+                end
+                if v.Name == "Canvander" then
+                    Canvander:Set("✅: Canvander")
+                end
+                if v.Name == "Twin Hooks" then
+                    Twin_Hooks:Set("✅: Twin Hooks")
+                end
+                if v.Name == "Spikey Trident" then
+                    Spikey_Trident:Set("✅: Spikey Trident")
+                end
+                if v.Name == "Hallow Scythe" then
+                    Hallow_Scythe:Set("✅: Hallow Scythe")
+                end
+                if v.Name == "Dark Dagger" then
+                    Dark_Dagger:Set("✅: Dark Dagger")
+                end
+                if v.Name == "Tushita" then
+                    Tushita:Set("✅: Tushita")
+                end
+                if v.Name == "Dark Blade" then
+                    Dark_Blade:Set("✅: Dark Blade")
+                end
+                if v.Name == "Cursed Dual Katana" then
+                    Cursed_Dual_Katana:Set("✅: Cursed Dual Katana")
+                end
+            end
+        end)
+    end
+end)
+
+local SSWLSection = MiscTab:CreateSection({
+    Name = "\\\\Status Sword Legendary//",
+    Side = "Right"
+})
+local Shisui = SSWLSection:AddLabel({
+    Name = "❌: Shisui"
+})
+local Saddi = SSWLSection:AddLabel({
+    Name = "❌: Saddi"
+})
+local Wando = SSWLSection:AddLabel({
+    Name = "❌: Wando"
+})
+local True_Triple_Katana = SSWLSection:AddLabel({
+    Name = "❌: True Triple Katana"
+})
+
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            for i,v in pairs(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("getInventoryWeapons")) do
+                if v.Name == "Shisui" then
+                    Shisui:Set("✅: Shisui")
+                end
+                if v.Name == "Saddi" then
+                    Saddi:Set("✅: Saddi")
+                end
+                if v.Name == "Wando" then
+                    Wando:Set("✅: Wando")
+                end
+                if v.Name == "True Triple Katana" then
+                    True_Triple_Katana:Set("✅: True Triple Katana")
+                end
+            end
+        end)
+    end
+end)
+
+local SGUNSection = MiscTab:CreateSection({
+    Name = "\\\\Status Gun//",
+    Side = "Right"
+})
+
+local Kabu_cha = SGUNSection:AddLabel({
+    Name = "❌: Kabucha"
+})
+local Acidum_Rifle = SGUNSection:AddLabel({
+    Name = "❌: Acidum Rifle"
+})
+local Bizarre_Rifle = SGUNSection:AddLabel({
+    Name = "❌: Bizarre Rifle"
+})
+local Serpent_Bow = SGUNSection:AddLabel({
+    Name = "❌: Serpent Bow"
+})
+local Soul_Guitar = SGUNSection:AddLabel({
+    Name = "❌: Soul Guitar"
+})
+
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            for i,v in pairs(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("getInventoryWeapons")) do
+                if v.Name == "Kabucha" then
+                    Kabu_cha:Set("✅: Kabucha")
+                end
+                if v.Name == "Acidum Rifle" then
+                    Acidum_Rifle:Set("✅: Acidum Rifle")
+                end
+                if v.Name == "Bizarre Rifle" then
+                    Bizarre_Rifle:Set("✅: Bizarre Rifle")
+                end
+                if v.Name == "Serpent Bow" then
+                    Serpent_Bow:Set("✅: Serpent Bow")
+                end
+                if v.Name == "Soul Guitar" then
+                    Soul_Guitar:Set("✅: Soul Guitar")
+                end
+            end
+        end)
+    end
+end)
+local SACCSection = MiscTab:CreateSection({
+    Name = "\\\\Status Accessory//",
+    Side = "Right"
+})
+
+local Dark_Coat = SACCSection:AddLabel({
+    Name = "❌: Dark Coat"
+})
+local Ghoul_Mask = SACCSection:AddLabel({
+    Name = "❌: Ghoul Mask"
+})
+local Swan_Glass = SACCSection:AddLabel({
+    Name = "❌: Swan Glass"
+})
+local Pale_Scarf = SACCSection:AddLabel({
+    Name = "❌: Pale Scarf"
+})
+local Valkyrie_Helm = SACCSection:AddLabel({
+    Name = "❌: Valkyrie Helm"
+})
+
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            for i,v in pairs(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("getInventoryWeapons")) do
+                if v.Name == "Dark Coat" then
+                    Dark_Coat:Set("✅: Dark Coat")
+                end
+                if v.Name == "Ghoul Mask" then
+                    Ghoul_Mask:Set("✅: Ghoul Mask")
+                end
+                if v.Name == "Swan Glasses" then
+                    Swan_Glass:Set("✅: Swan Glass")
+                end
+                if v.Name == "Pale Scarf" then
+                    Pale_Scarf:Set("✅: Pale Scarf")
+                end
+                if v.Name == "Valkyrie Helmet" then
+                    Valkyrie_Helm:Set("✅: Valkyrie Helmet")
+                end
+            end
+        end)
+    end
+end)
 
 local MainMiscSection = MiscTab:CreateSection({
     Name = "\\\\Main Misc//",
@@ -9537,6 +9995,7 @@ if _G.FPS_Boost then
     end
 end
 
+
 MainMiscSection:AddButton({
     Name = "Copy CFrame",
     Callback = function()
@@ -9550,3 +10009,4 @@ MainMiscSection:AdddButton({
     setfpscap(90)
 end
 })
+
